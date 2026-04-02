@@ -48,7 +48,9 @@
 
                 <x-menu-item title="Home" icon="o-sparkles" link="/" />
 
-                @role('admin')
+                
+		@role('admin')
+		<x-menu-item title="Users" icon="o-users" link="/admin/users" />
                 <x-menu-separator />
                 <x-menu-item title="Program" icon="o-archive-box" link="/admin/program" />
                 @endrole
