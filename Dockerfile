@@ -33,31 +33,22 @@ RUN mkdir -p storage bootstrap/cache \
 
 RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
 
-RUN printf 'server {\n\
-    listen %s;\n\
-    server_name _;\n\
-    root /var/www/html/public;\n\
-    index index.php index.html;\n\
-    location / {\n\
-        try_files $uri $uri/ /index.php?$query_string;\n\
-    }\n\
-    location ~ \\.php$ {\n\
-        include fastcgi_params;\n\
-        fastcgi_pass 127.0.0.1:9000;\n\
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\n\
-    }\n\
-}\n' '${PORT:-80}' > /etc/nginx/sites-available/default
+COPY .docker/nginx/default.conf /etc/nginx/sites-available/default
 
-RUN printf '#!/bin/sh\n\
-php /var/www/html/artisan migrate --force\n\
-php /var/www/html/artisan storage:link\n\
-php /var/www/html/artisan config:cache\n\
-php /var/www/html/artisan route:cache\n\
-php /var/www/html/artisan view:cache\n\
-sed -i "s/\${PORT:-80}/${PORT:-80}/" /etc/nginx/sites-available/default\n\
-php-fpm -D\n\
-nginx -g "daemon off;"\n' \
-    > /usr/local/bin/startup && chmod +x /usr/local/bin/startup
+RUN cat > /usr/local/bin/startup << 'SCRIPT'
+#!/bin/sh
+php /var/www/html/artisan migrate --force
+php /var/www/html/artisan storage:link
+php /var/www/html/artisan config:cache
+php /var/www/html/artisan route:cache
+php /var/www/html/artisan view:cache
+REAL_PORT=${PORT:-80}
+sed -i "s/listen 80/listen $REAL_PORT/" /etc/nginx/sites-available/default
+php-fpm -D
+exec nginx -g "daemon off;"
+SCRIPT
+
+RUN chmod +x /usr/local/bin/startup
 
 EXPOSE 80
 
