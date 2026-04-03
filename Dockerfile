@@ -33,17 +33,32 @@ RUN mkdir -p storage bootstrap/cache \
 
 RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
 
-COPY .docker/nginx/default.conf /etc/nginx/sites-available/default
+RUN cat > /etc/nginx/sites-available/default << 'NGINXCONF'
+server {
+    listen NGINX_PORT;
+    server_name _;
+    root /var/www/html/public;
+    index index.php index.html;
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+}
+NGINXCONF
 
 RUN cat > /usr/local/bin/startup << 'SCRIPT'
 #!/bin/sh
 php /var/www/html/artisan migrate --force
-php /var/www/html/artisan storage:link
+php /var/www/html/artisan storage:link || true
 php /var/www/html/artisan config:cache
 php /var/www/html/artisan route:cache
 php /var/www/html/artisan view:cache
 REAL_PORT=${PORT:-80}
-sed -i "s/listen 80/listen $REAL_PORT/" /etc/nginx/sites-available/default
+sed -i "s/NGINX_PORT/$REAL_PORT/" /etc/nginx/sites-available/default
 php-fpm -D
 exec nginx -g "daemon off;"
 SCRIPT
