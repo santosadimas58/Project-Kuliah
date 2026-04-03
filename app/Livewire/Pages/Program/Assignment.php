@@ -6,7 +6,6 @@ use App\Models\Assignment as AssignmentModel;
 #[Layout('layouts.app')]
 class Assignment extends Component
 {
-    public $assignments;
     public $showModal = false;
     public $editMode = false;
     public $assignmentId;
@@ -16,8 +15,14 @@ class Assignment extends Component
     public $deadline = '';
     public $status = 'Aktif';
 
-    public function mount() { $this->loadAssignments(); }
-    public function loadAssignments() { $this->assignments = AssignmentModel::latest()->get(); }
+    public $search = '';
+    public $filterStatus = '';
+
+    public function resetFilter()
+    {
+        $this->search = '';
+        $this->filterStatus = '';
+    }
 
     public function openModal() { $this->resetFields(); $this->editMode = false; $this->showModal = true; }
     public function closeModal() { $this->showModal = false; $this->resetFields(); }
@@ -57,7 +62,6 @@ class Assignment extends Component
             $this->dispatch('mary-toast', toast: ['type' => 'success', 'title' => 'Berhasil!', 'description' => 'Tugas berhasil ditambahkan.', 'position' => 'toast-top toast-end', 'icon' => '', 'css' => 'alert-success', 'timeout' => 3000, 'noProgress' => false]);
         }
         $this->closeModal();
-        $this->loadAssignments();
     }
 
     public function edit($id)
@@ -77,8 +81,17 @@ class Assignment extends Component
     {
         AssignmentModel::find($id)->delete();
         $this->dispatch('mary-toast', toast: ['type' => 'error', 'title' => 'Dihapus!', 'description' => 'Tugas berhasil dihapus.', 'position' => 'toast-top toast-end', 'icon' => '', 'css' => 'alert-error', 'timeout' => 3000, 'noProgress' => false]);
-        $this->loadAssignments();
     }
 
-    public function render() { return view('livewire.pages.program.assignment'); }
+    public function render()
+    {
+        $assignments = AssignmentModel::query()
+            ->when($this->search, fn($q) => $q->where('judul', 'like', '%'.$this->search.'%')
+                ->orWhere('mata_pelajaran', 'like', '%'.$this->search.'%'))
+            ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))
+            ->latest()
+            ->get();
+
+        return view('livewire.pages.program.assignment', compact('assignments'));
+    }
 }

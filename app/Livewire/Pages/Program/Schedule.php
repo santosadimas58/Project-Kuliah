@@ -6,7 +6,6 @@ use App\Models\Schedule as ScheduleModel;
 #[Layout('layouts.app')]
 class Schedule extends Component
 {
-    public $schedules;
     public $showModal = false;
     public $editMode = false;
     public $scheduleId;
@@ -18,8 +17,21 @@ class Schedule extends Component
     public $ruangan = '';
     public $status = 'Aktif';
 
-    public function mount() { $this->loadSchedules(); }
-    public function loadSchedules() { $this->schedules = ScheduleModel::latest()->get(); }
+    // Search & Filter
+    public $search = '';
+    public $filterHari = '';
+    public $filterStatus = '';
+
+    public function updatedSearch() { }
+    public function updatedFilterHari() { }
+    public function updatedFilterStatus() { }
+
+    public function resetFilter()
+    {
+        $this->search = '';
+        $this->filterHari = '';
+        $this->filterStatus = '';
+    }
 
     public function openModal() { $this->resetFields(); $this->editMode = false; $this->showModal = true; }
     public function closeModal() { $this->showModal = false; $this->resetFields(); }
@@ -62,7 +74,6 @@ class Schedule extends Component
             $this->dispatch('mary-toast', toast: ['type' => 'success', 'title' => 'Berhasil!', 'description' => 'Jadwal berhasil ditambahkan.', 'position' => 'toast-top toast-end', 'icon' => '', 'css' => 'alert-success', 'timeout' => 3000, 'noProgress' => false]);
         }
         $this->closeModal();
-        $this->loadSchedules();
     }
 
     public function edit($id)
@@ -84,8 +95,19 @@ class Schedule extends Component
     {
         ScheduleModel::find($id)->delete();
         $this->dispatch('mary-toast', toast: ['type' => 'error', 'title' => 'Dihapus!', 'description' => 'Jadwal berhasil dihapus.', 'position' => 'toast-top toast-end', 'icon' => '', 'css' => 'alert-error', 'timeout' => 3000, 'noProgress' => false]);
-        $this->loadSchedules();
     }
 
-    public function render() { return view('livewire.pages.program.schedule'); }
+    public function render()
+    {
+        $schedules = ScheduleModel::query()
+            ->when($this->search, fn($q) => $q->where('mata_pelajaran', 'like', '%'.$this->search.'%')
+                ->orWhere('guru', 'like', '%'.$this->search.'%')
+                ->orWhere('ruangan', 'like', '%'.$this->search.'%'))
+            ->when($this->filterHari, fn($q) => $q->where('hari', $this->filterHari))
+            ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))
+            ->latest()
+            ->get();
+
+        return view('livewire.pages.program.schedule', compact('schedules'));
+    }
 }
