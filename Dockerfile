@@ -13,7 +13,7 @@ RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
 RUN apt-get update && apt-get install -y \
     libpq-dev libonig-dev libxml2-dev libzip-dev \
     libpng-dev libjpeg-dev libfreetype6-dev \
-    zip unzip git curl gnupg ca-certificates sudo nginx \
+    zip unzip git curl gnupg ca-certificates sudo nginx supervisor \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -33,22 +33,30 @@ RUN mkdir -p storage bootstrap/cache \
 
 RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
 
-RUN cat > /etc/nginx/sites-available/default << 'NGINXCONF'
-server {
-    listen NGINX_PORT;
-    server_name _;
-    root /var/www/html/public;
-    index index.php index.html;
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-    location ~ \.php$ {
-        include fastcgi_params;
-        fastcgi_pass 127.0.0.1:9000;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-    }
-}
-NGINXCONF
+RUN cat > /etc/supervisor/conf.d/app.conf << 'SUPCONF'
+[supervisord]
+nodaemon=true
+logfile=/dev/null
+logfile_maxbytes=0
+
+[program:php-fpm]
+command=php-fpm -F
+autostart=true
+autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+
+[program:nginx]
+command=nginx -g "daemon off;"
+autostart=true
+autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+SUPCONF
 
 RUN cat > /usr/local/bin/startup << 'SCRIPT'
 #!/bin/sh
@@ -58,9 +66,23 @@ php /var/www/html/artisan config:cache
 php /var/www/html/artisan route:cache
 php /var/www/html/artisan view:cache
 REAL_PORT=${PORT:-80}
-sed -i "s/NGINX_PORT/$REAL_PORT/" /etc/nginx/sites-available/default
-php-fpm -D
-exec nginx -g "daemon off;"
+cat > /etc/nginx/sites-available/default << NGINXEOF
+server {
+    listen $REAL_PORT;
+    server_name _;
+    root /var/www/html/public;
+    index index.php index.html;
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
+    }
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+    }
+}
+NGINXEOF
+exec supervisord -c /etc/supervisor/supervisord.conf
 SCRIPT
 
 RUN chmod +x /usr/local/bin/startup
