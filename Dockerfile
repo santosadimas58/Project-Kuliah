@@ -33,6 +33,23 @@ RUN mkdir -p storage bootstrap/cache \
 
 RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
 
+RUN cat > /etc/nginx/sites-available/default << 'NGINXCONF'
+server {
+    listen 8080;
+    server_name _;
+    root /var/www/html/public;
+    index index.php index.html;
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+}
+NGINXCONF
+
 RUN cat > /etc/supervisor/conf.d/app.conf << 'SUPCONF'
 [supervisord]
 nodaemon=true
@@ -65,28 +82,11 @@ php /var/www/html/artisan storage:link || true
 php /var/www/html/artisan config:cache
 php /var/www/html/artisan route:cache
 php /var/www/html/artisan view:cache
-REAL_PORT=${PORT:-80}
-cat > /etc/nginx/sites-available/default << NGINXEOF
-server {
-    listen $REAL_PORT;
-    server_name _;
-    root /var/www/html/public;
-    index index.php index.html;
-    location / {
-        try_files \$uri \$uri/ /index.php?\$query_string;
-    }
-    location ~ \.php$ {
-        include fastcgi_params;
-        fastcgi_pass 127.0.0.1:9000;
-        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-    }
-}
-NGINXEOF
 exec supervisord -c /etc/supervisor/supervisord.conf
 SCRIPT
 
 RUN chmod +x /usr/local/bin/startup
 
-EXPOSE 80
+EXPOSE 8080
 
 ENTRYPOINT ["/usr/local/bin/startup"]
