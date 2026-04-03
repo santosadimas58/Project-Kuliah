@@ -3,6 +3,7 @@ namespace App\Livewire\Pages\Admin;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Models\User;
+use App\Models\Program as ProgramModel;
 use Spatie\Permission\Models\Role;
 #[Layout('layouts.app')]
 class Dashboard extends Component
@@ -12,6 +13,7 @@ class Dashboard extends Component
         return view('livewire.pages.admin.dashboard', [
             'totalUsers' => User::count(),
             'totalRoles' => Role::count(),
+            'totalPrograms' => ProgramModel::count(),
         ]);
     }
 }

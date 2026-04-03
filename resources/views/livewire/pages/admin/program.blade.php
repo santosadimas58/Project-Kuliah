@@ -1,44 +1,48 @@
-<div class="p-6">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Program</h1>
-        <x-button label="+ Tambah Program Baru" wire:click="openModal" class="btn-primary" />
-    </div>
+<div>
+    <x-header title="Program" subtitle="Manajemen data program" separator>
+        <x-slot:actions>
+            <x-button label="+ Tambah Program" wire:click="openModal" class="btn-primary" icon="o-plus" />
+        </x-slot:actions>
+    </x-header>
 
-    <div class="overflow-x-auto rounded-lg shadow">
-        <table class="table table-zebra w-full">
-            <thead>
-                <tr>
-                    <th>Kode</th>
-                    <th>Nama Program</th>
-                    <th>Jalur</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($programs as $program)
-                <tr>
-                    <td>{{ $program->kode_program }}</td>
-                    <td>{{ $program->nama_program }}</td>
-                    <td>{{ $program->jalur }}</td>
-                    <td>
-                        <span class="badge {{ $program->status === 'Aktif' ? 'badge-success' : ($program->status === 'Nonaktif' ? 'badge-error' : 'badge-warning') }}">
-                            {{ $program->status }}
-                        </span>
-                    </td>
-                    <td class="flex gap-2">
-                        <x-button label="Edit" wire:click="edit({{ $program->id }})" class="btn-sm btn-info" />
-                        <x-button label="Hapus" wire:click="delete({{ $program->id }})" wire:confirm="Yakin ingin menghapus?" class="btn-sm btn-error" />
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="text-center py-4">Belum ada data program.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+    <x-card>
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr>
+                        <th>Kode</th>
+                        <th>Nama Program</th>
+                        <th>Jalur</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($programs as $program)
+                    <tr>
+                        <td>{{ $program->kode_program }}</td>
+                        <td>{{ $program->nama_program }}</td>
+                        <td>{{ $program->jalur }}</td>
+                        <td>
+                            <x-badge :value="$program->status" class="{{ $program->status === 'Aktif' ? 'badge-success' : ($program->status === 'Nonaktif' ? 'badge-error' : 'badge-warning') }}" />
+                        </td>
+                        <td class="flex gap-2">
+                            <x-button label="Edit" wire:click="edit({{ $program->id }})" class="btn-sm btn-info" icon="o-pencil" />
+                            <x-button label="Hapus" wire:click="delete({{ $program->id }})" wire:confirm="Yakin ingin menghapus?" class="btn-sm btn-error" icon="o-trash" />
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="text-center py-8">
+                            <x-icon name="o-archive-box" class="w-12 h-12 mx-auto opacity-30 mb-2" />
+                            <p class="opacity-50">Belum ada data program.</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </x-card>
 
     <x-modal wire:model="showModal" title="{{ $editMode ? 'Edit Program' : 'Tambah Program Baru' }}">
         <x-input label="Kode Program" wire:model="kode_program" disabled />
@@ -62,8 +66,8 @@
         @error('status') <span class="text-error text-xs">{{ $message }}</span> @enderror
 
         <x-slot:actions>
-            <x-button label="Batal" wire:click="closeModal" />
-            <x-button label="Simpan" wire:click="save" class="btn-primary" />
+            <x-button label="Batal" wire:click="closeModal" icon="o-x-mark" />
+            <x-button label="Simpan" wire:click="save" class="btn-primary" icon="o-check" />
         </x-slot:actions>
     </x-modal>
 </div>

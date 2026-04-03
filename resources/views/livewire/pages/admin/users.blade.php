@@ -1,44 +1,53 @@
-<div class="p-6">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Manajemen User</h1>
-        <x-button label="+ Tambah User" wire:click="openModal" class="btn-primary" />
-    </div>
+<div>
+    <x-header title="Manajemen User" subtitle="Kelola user dan role" separator>
+        <x-slot:actions>
+            <x-button label="+ Tambah User" wire:click="openModal" class="btn-primary" icon="o-plus" />
+        </x-slot:actions>
+    </x-header>
 
-    <div class="overflow-x-auto rounded-lg shadow">
-        <table class="table table-zebra w-full">
-            <thead>
-                <tr>
-                    <th>Nama</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($users as $user)
-                <tr>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>
-                        @foreach($user->getRoleNames() as $role)
-                        <span class="badge {{ $role === 'admin' ? 'badge-primary' : 'badge-secondary' }}">
-                            {{ $role }}
-                        </span>
-                        @endforeach
-                    </td>
-                    <td class="flex gap-2">
-                        <x-button label="Edit" wire:click="edit({{ $user->id }})" class="btn-sm btn-info" />
-                        <x-button label="Hapus" wire:click="delete({{ $user->id }})" wire:confirm="Yakin ingin menghapus user ini?" class="btn-sm btn-error" />
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" class="text-center py-4">Belum ada data user.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+    <x-card>
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($users as $user)
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <x-avatar :placeholder="strtoupper(substr($user->name, 0, 1))" class="w-8 h-8" />
+                                {{ $user->name }}
+                            </div>
+                        </td>
+                        <td>{{ $user->email }}</td>
+                        <td>
+                            @foreach($user->getRoleNames() as $role)
+                            <x-badge :value="$role" class="{{ $role === 'admin' ? 'badge-primary' : 'badge-secondary' }}" />
+                            @endforeach
+                        </td>
+                        <td class="flex gap-2">
+                            <x-button label="Edit" wire:click="edit({{ $user->id }})" class="btn-sm btn-info" icon="o-pencil" />
+                            <x-button label="Hapus" wire:click="delete({{ $user->id }})" wire:confirm="Yakin ingin menghapus user ini?" class="btn-sm btn-error" icon="o-trash" />
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="text-center py-8">
+                            <x-icon name="o-users" class="w-12 h-12 mx-auto opacity-30 mb-2" />
+                            <p class="opacity-50">Belum ada data user.</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </x-card>
 
     <x-modal wire:model="showModal" title="{{ $editMode ? 'Edit User' : 'Tambah User Baru' }}">
         <x-input label="Nama" wire:model="name" placeholder="Masukkan nama" />
@@ -56,8 +65,8 @@
         @error('selectedRole') <span class="text-error text-xs">{{ $message }}</span> @enderror
 
         <x-slot:actions>
-            <x-button label="Batal" wire:click="closeModal" />
-            <x-button label="Simpan" wire:click="save" class="btn-primary" />
+            <x-button label="Batal" wire:click="closeModal" icon="o-x-mark" />
+            <x-button label="Simpan" wire:click="save" class="btn-primary" icon="o-check" />
         </x-slot:actions>
     </x-modal>
 </div>

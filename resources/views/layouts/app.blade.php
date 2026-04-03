@@ -46,9 +46,13 @@
                     <x-menu-separator />
                 @endif
 
-                <x-menu-item title="Home" icon="o-sparkles" link="/" />
-
-                
+		@if(auth()->check() && auth()->user()->hasRole('admin'))
+    		<x-menu-item title="Home" icon="o-sparkles" link="/admin/dashboard" />
+		@elseif(auth()->check() && auth()->user()->hasRole('program'))
+    		<x-menu-item title="Home" icon="o-sparkles" link="/user/dashboard" />
+		@else
+    		<x-menu-item title="Home" icon="o-sparkles" link="/user/dashboard" />
+		@endif	                
 		@role('admin')
 		<x-menu-item title="Users" icon="o-users" link="/admin/users" />
                 <x-menu-separator />
