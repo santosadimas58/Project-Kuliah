@@ -79,6 +79,7 @@ RUN cat > /usr/local/bin/startup << 'SCRIPT'
 #!/bin/sh
 php /var/www/html/artisan migrate --force
 php /var/www/html/artisan db:seed --force 2>/dev/null || true
+php /var/www/html/artisan db:seed --force 2>/dev/null || true
 php /var/www/html/artisan storage:link || true
 php /var/www/html/artisan config:cache
 php /var/www/html/artisan route:cache
