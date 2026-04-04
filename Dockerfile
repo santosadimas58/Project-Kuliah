@@ -39,13 +39,17 @@ server {
     server_name _;
     root /var/www/html/public;
     index index.php index.html;
+
     location / {
         try_files $uri $uri/ /index.php?$query_string;
     }
+
     location ~ \.php$ {
         include fastcgi_params;
         fastcgi_pass 127.0.0.1:9000;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param HTTP_X_FORWARDED_PROTO https;
+        fastcgi_param HTTPS on;
     }
 }
 NGINXCONF
@@ -77,16 +81,14 @@ SUPCONF
 
 RUN cat > /usr/local/bin/startup << 'SCRIPT'
 #!/bin/sh
+chmod -R 777 /var/www/html/storage
 php /var/www/html/artisan migrate --force
 php /var/www/html/artisan db:seed --force 2>/dev/null || true
-php /var/www/html/artisan db:seed --force 2>/dev/null || true
 php /var/www/html/artisan storage:link || true
-php /var/www/html/artisan config:cache
-php /var/www/html/artisan route:clear
 php /var/www/html/artisan config:clear
+php /var/www/html/artisan route:clear
 php /var/www/html/artisan cache:clear
-php /var/www/html/artisan view:cache
-chmod -R 777 /var/www/html/storage
+php /var/www/html/artisan view:clear
 exec supervisord -c /etc/supervisor/supervisord.conf
 SCRIPT
 
