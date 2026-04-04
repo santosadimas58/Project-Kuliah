@@ -13,7 +13,7 @@ class Login extends Component
     public function mount()
     {
         if (Auth::check()) {
-            return redirect()->to('/admin/dashboard');
+            $this->redirectRoute('admin.dashboard');
         }
     }
 
@@ -28,11 +28,14 @@ class Login extends Component
             app()[PermissionRegistrar::class]->forgetCachedPermissions();
             $user = Auth::user();
             if ($user->hasRole('admin')) {
-                return redirect()->to('/admin/dashboard');
+                $this->redirectRoute('admin.dashboard', navigate: false);
+                return;
             } elseif ($user->hasRole('program')) {
-                return redirect()->to('/program/teacher');
+                $this->redirectRoute('program.teacher', navigate: false);
+                return;
             }
-            return redirect()->to('/user/dashboard');
+            $this->redirectRoute('user.dashboard', navigate: false);
+            return;
         }
         $this->addError('email', 'Invalid credentials');
     }
