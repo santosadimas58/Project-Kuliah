@@ -82,7 +82,9 @@ php /var/www/html/artisan db:seed --force 2>/dev/null || true
 php /var/www/html/artisan db:seed --force 2>/dev/null || true
 php /var/www/html/artisan storage:link || true
 php /var/www/html/artisan config:cache
-php /var/www/html/artisan route:cache
+php /var/www/html/artisan route:clear
+php /var/www/html/artisan config:clear
+php /var/www/html/artisan cache:clear
 php /var/www/html/artisan view:cache
 chmod -R 777 /var/www/html/storage
 exec supervisord -c /etc/supervisor/supervisord.conf
