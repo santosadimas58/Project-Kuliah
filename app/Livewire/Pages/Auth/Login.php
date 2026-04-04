@@ -3,6 +3,7 @@ namespace App\Livewire\Pages\Auth;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\PermissionRegistrar;
 #[Layout('layouts.app')]
 class Login extends Component
@@ -27,13 +28,16 @@ class Login extends Component
         if (Auth::attempt(['email' => $this->email, 'password' => $this->password])) {
             app()[PermissionRegistrar::class]->forgetCachedPermissions();
             session()->regenerate();
+            
             $user = Auth::user();
-            if ($user->hasRole('admin')) {
-                return $this->redirect('/admin/dashboard', navigate: false);
-            } elseif ($user->hasRole('program')) {
-                return $this->redirect('/program/teacher', navigate: false);
-            }
-            return $this->redirect('/user/dashboard', navigate: false);
+            Log::info('Login success', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'roles' => $user->getRoleNames(),
+                'session_id' => session()->getId(),
+            ]);
+            
+            return redirect()->to('/admin/dashboard');
         }
         $this->addError('email', 'Invalid credentials');
     }
