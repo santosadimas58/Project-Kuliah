@@ -13,11 +13,7 @@ class Login extends Component
     public function mount()
     {
         if (Auth::check()) {
-            app()[PermissionRegistrar::class]->forgetCachedPermissions();
-            if (Auth::user()->hasRole('admin')) {
-                return redirect()->route('admin.dashboard');
-            }
-            return redirect()->route('user.dashboard');
+            return redirect()->to('/admin/dashboard');
         }
     }
 
@@ -30,11 +26,14 @@ class Login extends Component
 
         if (Auth::attempt(['email' => $this->email, 'password' => $this->password])) {
             app()[PermissionRegistrar::class]->forgetCachedPermissions();
+            session()->regenerate();
             $user = Auth::user();
             if ($user->hasRole('admin')) {
-                return redirect()->route('admin.dashboard');
+                return $this->redirect('/admin/dashboard', navigate: false);
+            } elseif ($user->hasRole('program')) {
+                return $this->redirect('/program/teacher', navigate: false);
             }
-            return redirect()->route('user.dashboard');
+            return $this->redirect('/user/dashboard', navigate: false);
         }
         $this->addError('email', 'Invalid credentials');
     }
