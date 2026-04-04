@@ -3,6 +3,7 @@ namespace App\Livewire\Pages\Auth;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\PermissionRegistrar;
 #[Layout('layouts.app')]
 class Login extends Component
 {
@@ -12,6 +13,7 @@ class Login extends Component
     public function mount()
     {
         if (Auth::check()) {
+            app()[PermissionRegistrar::class]->forgetCachedPermissions();
             if (Auth::user()->hasRole('admin')) {
                 return redirect()->route('admin.dashboard');
             }
@@ -27,13 +29,13 @@ class Login extends Component
         ]);
 
         if (Auth::attempt(['email' => $this->email, 'password' => $this->password])) {
+            app()[PermissionRegistrar::class]->forgetCachedPermissions();
             $user = Auth::user();
             if ($user->hasRole('admin')) {
                 return redirect()->route('admin.dashboard');
             }
             return redirect()->route('user.dashboard');
         }
-
         $this->addError('email', 'Invalid credentials');
     }
 
