@@ -1,19 +1,11 @@
-FROM node:20-slim AS node_base
-
 FROM php:8.2-fpm
-
-COPY --from=node_base /usr/local/bin/node /usr/local/bin/node
-COPY --from=node_base /usr/local/bin/npm  /usr/local/bin/npm
-COPY --from=node_base /usr/local/bin/npx  /usr/local/bin/npx
-COPY --from=node_base /usr/local/lib/node_modules /usr/local/lib/node_modules
-RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
-    && ln -sf /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
-    && node -v && npm -v
 
 RUN apt-get update && apt-get install -y \
     libpq-dev libonig-dev libxml2-dev libzip-dev \
     libpng-dev libjpeg-dev libfreetype6-dev \
     zip unzip git curl gnupg ca-certificates sudo nginx supervisor \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -24,7 +16,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+RUN rm -rf node_modules vendor
+RUN composer install --optimize-autoloader --no-interaction
 RUN npm install && npm run build
 
 RUN mkdir -p storage bootstrap/cache \
@@ -33,68 +26,37 @@ RUN mkdir -p storage bootstrap/cache \
 
 RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
 
-RUN cat > /etc/nginx/sites-available/default << 'NGINXCONF'
-server {
-    listen 8080;
-    server_name _;
-    root /var/www/html/public;
-    index index.php index.html;
+RUN printf 'server {\n\
+    listen 8080;\n\
+    server_name _;\n\
+    root /var/www/html/public;\n\
+    index index.php index.html;\n\
+    location / {\n\
+        try_files $uri $uri/ /index.php?$query_string;\n\
+    }\n\
+    location ~ \\.php$ {\n\
+        include fastcgi_params;\n\
+        fastcgi_pass 127.0.0.1:9000;\n\
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\n\
+    }\n\
+}\n' > /etc/nginx/sites-available/default \
+    && ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
+RUN printf '[unix_http_server]\nfile=/var/run/supervisor.sock\nchmod=0700\n\n[supervisord]\nnodaemon=true\nlogfile=/dev/null\nlogfile_maxbytes=0\npidfile=/var/run/supervisord.pid\n\n[rpcinterface:supervisor]\nsupervisor.rpcinterface_factory=supervisor.rpcinterface:make_main_rpcinterface\n\n[supervisorctl]\nserverurl=unix:///var/run/supervisor.sock\n\n[program:php-fpm]\ncommand=php-fpm -F\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\n\n[program:nginx]\ncommand=nginx -g "daemon off;"\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\n' > /etc/supervisord.conf
 
-    location ~ \.php$ {
-        include fastcgi_params;
-        fastcgi_pass 127.0.0.1:9000;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param HTTP_X_FORWARDED_PROTO https;
-        fastcgi_param HTTPS on;
-    }
-}
-NGINXCONF
-
-RUN cat > /etc/supervisor/conf.d/app.conf << 'SUPCONF'
-[supervisord]
-nodaemon=true
-logfile=/dev/null
-logfile_maxbytes=0
-
-[program:php-fpm]
-command=php-fpm -F
-autostart=true
-autorestart=true
-stdout_logfile=/dev/stdout
-stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
-
-[program:nginx]
-command=nginx -g "daemon off;"
-autostart=true
-autorestart=true
-stdout_logfile=/dev/stdout
-stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
-SUPCONF
-
-RUN cat > /usr/local/bin/startup << 'SCRIPT'
-#!/bin/sh
-chmod -R 777 /var/www/html/storage
-chown -R www-data:www-data /var/www/html/storage
-php /var/www/html/artisan migrate --force
-php /var/www/html/artisan db:seed --force 2>/dev/null || true
-php /var/www/html/artisan storage:link || true
-php /var/www/html/artisan config:clear
-php /var/www/html/artisan route:clear
-php /var/www/html/artisan cache:clear
-php /var/www/html/artisan view:clear
-exec supervisord -c /etc/supervisor/supervisord.conf
-SCRIPT
-
-RUN chmod +x /usr/local/bin/startup
+RUN printf '#!/bin/sh\n\
+chmod -R 777 /var/www/html/storage\n\
+chown -R www-data:www-data /var/www/html/storage\n\
+php /var/www/html/artisan migrate --force\n\
+php /var/www/html/artisan db:seed --force 2>/dev/null || true\n\
+php /var/www/html/artisan storage:link 2>/dev/null || true\n\
+php /var/www/html/artisan key:generate --force
+php /var/www/html/artisan config:clear\n\
+php /var/www/html/artisan route:clear\n\
+php /var/www/html/artisan cache:clear\n\
+php /var/www/html/artisan view:clear\n\
+exec /usr/bin/supervisord -c /etc/supervisord.conf\n\
+' > /usr/local/bin/startup && chmod +x /usr/local/bin/startup
 
 EXPOSE 8080
-
 ENTRYPOINT ["/usr/local/bin/startup"]
