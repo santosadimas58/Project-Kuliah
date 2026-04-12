@@ -69,9 +69,6 @@
         {{-- Menu --}}
         <x-card title="Menu" icon="o-squares-2x2">
             <div class="grid grid-cols-2 gap-3">
-                <a href="/admin/teacher">
-                    <x-button label="Dosen" icon="o-academic-cap" class="btn-outline w-full" />
-                </a>
                 <a href="/program/subject">
                     <x-button label="Mata Kuliah" icon="o-book-open" class="btn-outline w-full" />
                 </a>
