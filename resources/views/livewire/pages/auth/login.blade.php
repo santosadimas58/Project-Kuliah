@@ -1,37 +1,51 @@
-<div class="min-h-screen flex items-center justify-center">
-    <x-card class="w-full max-w-md shadow-xl">
-        <div class="text-center mb-6">
-            <x-icon name="o-lock-closed" class="w-12 h-12 mx-auto text-primary mb-2" />
-            <h1 class="text-2xl font-bold">Login</h1>
-            <p class="text-sm opacity-50">Masukkan kredensial Anda</p>
+<div class="min-h-screen flex items-center justify-center bg-base-200">
+    <div class="w-full max-w-md px-4">
+        {{-- Logo & App Name --}}
+        <div class="text-center mb-17">
+            <div class="flex items-center justify-center gap-2 mb-2">
+             <x-icon name="o-sparkles" class="w-8 h-8 text-primary" />
+                <span class="text-3xl font-black text-primary">SimProdi</span>
+            </div>
+            <p class="text-sm opacity-50">Sistem Informasi Manajemen Program Studi</p>
         </div>
 
-        <x-input
-            label="Email"
-            wire:model="email"
-            type="email"
-            placeholder="Masukkan email"
-            icon="o-envelope"
-            class="mb-3"
-        />
-        @error('email')
-            <x-alert title="{{ $message }}" class="alert-error mb-3" />
-        @enderror
+        {{-- Login Card --}}
+        <x-card class="w-full shadow-xl">
+            <div class="text-center mb-6">
+                <h1 class="text-xl font-bold">Masuk ke Sistem</h1>
+                <p class="text-sm opacity-50 mt-1">Masukkan kredensial Anda untuk melanjutkan</p>
+            </div>
+            <div class="flex flex-col gap-4">
+                <div>
+                    <x-input
+                        label="Email"
+                        wire:model="email"
+                        type="email"
+                        placeholder="Masukkan email"
+                        icon="o-envelope"
+                    />
+                    @error('email')
+                        <x-alert title="{{ $message }}" class="alert-error mt-2" />
+                    @enderror
+                </div>
+                <div>
+                    <x-input
+                        label="Password"
+                        wire:model="password"
+                        type="password"
+                        placeholder="Masukkan password"
+                        icon="o-key"
+                    />
+                </div>
+                <x-button
+                    label="Login"
+                    wire:click="authenticate"
+                    class="btn-primary w-full mt-2"
+                    icon="o-arrow-right-on-rectangle"
+                />
+            </div>
+        </x-card>
 
-        <x-input
-            label="Password"
-            wire:model="password"
-            type="password"
-            placeholder="Masukkan password"
-            icon="o-key"
-            class="mb-6"
-        />
-
-        <x-button
-            label="Login"
-            wire:click="authenticate"
-            class="btn-primary w-full"
-            icon="o-arrow-right-on-rectangle"
-        />
-    </x-card>
+        <p class="text-center text-xs opacity-30 mt-6">© 2026 SimProdi. All rights reserved.</p>
+    </div>
 </div>

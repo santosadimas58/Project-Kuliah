@@ -4,7 +4,7 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\PermissionRegistrar;
-#[Layout('layouts.app')]
+#[Layout('layouts.guest')]
 class Login extends Component
 {
     public $email = '';
