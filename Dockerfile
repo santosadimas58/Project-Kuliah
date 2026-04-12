@@ -50,7 +50,7 @@ chown -R www-data:www-data /var/www/html/storage\n\
 php /var/www/html/artisan migrate --force\n\
 php /var/www/html/artisan db:seed --force 2>/dev/null || true\n\
 php /var/www/html/artisan storage:link 2>/dev/null || true\n\
-php /var/www/html/artisan key:generate --force
+php /var/www/html/artisan key:generate --force\n\
 php /var/www/html/artisan config:clear\n\
 php /var/www/html/artisan route:clear\n\
 php /var/www/html/artisan cache:clear\n\

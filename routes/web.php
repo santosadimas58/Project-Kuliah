@@ -1,5 +1,4 @@
 <?php
-
 use App\Livewire\Pages\Auth\Login;
 use App\Livewire\Pages\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Pages\Admin\Users as AdminUsers;
@@ -13,7 +12,6 @@ use App\Livewire\Pages\Program\Schedule;
 use App\Livewire\Pages\Program\Assignment;
 
 Route::get('/', Login::class)->name('login');
-
 Route::get('/logout', function () {
     auth()->logout();
     return redirect('/');
@@ -24,6 +22,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/users', AdminUsers::class)->name('users');
     Route::get('/program', AdminProgram::class)->name('program');
     Route::get('/inventory', AdminInventory::class)->name('inventory');
+    Route::get('/teacher', Teacher::class)->name('teacher');
 });
 
 Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
@@ -32,7 +31,6 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
 });
 
 Route::middleware(['auth', 'role:program'])->prefix('program')->name('program.')->group(function () {
-    Route::get('/teacher', Teacher::class)->name('teacher');
     Route::get('/subject', Subject::class)->name('subject');
     Route::get('/schedule', Schedule::class)->name('schedule');
     Route::get('/assignment', Assignment::class)->name('assignment');
