@@ -3,6 +3,7 @@ namespace App\Livewire\Pages\Program;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Models\Teacher as TeacherModel;
+use App\Models\Program;
 #[Layout('layouts.app')]
 class Teacher extends Component
 {
@@ -10,19 +11,21 @@ class Teacher extends Component
     public $editMode = false;
     public $teacherId;
     public $kode_guru = '';
+    public $program_id = '';
     public $nama = '';
     public $email = '';
     public $no_hp = '';
     public $mata_pelajaran = '';
     public $status = 'Aktif';
-
     public $search = '';
     public $filterStatus = '';
+    public $filterProgram = '';
 
     public function resetFilter()
     {
         $this->search = '';
         $this->filterStatus = '';
+        $this->filterProgram = '';
     }
 
     public function openModal()
@@ -39,6 +42,7 @@ class Teacher extends Component
     {
         $this->teacherId = null;
         $this->kode_guru = '';
+        $this->program_id = '';
         $this->nama = '';
         $this->email = '';
         $this->no_hp = '';
@@ -53,26 +57,27 @@ class Teacher extends Component
             'email' => 'required|email|unique:teachers,email' . ($this->editMode ? ',' . $this->teacherId : ''),
             'status' => 'required',
         ]);
-
         if ($this->editMode) {
             TeacherModel::find($this->teacherId)->update([
+                'program_id' => $this->program_id ?: null,
                 'nama' => $this->nama,
                 'email' => $this->email,
                 'no_hp' => $this->no_hp,
                 'mata_pelajaran' => $this->mata_pelajaran,
                 'status' => $this->status,
             ]);
-            $this->dispatch('mary-toast', toast: ['type' => 'success', 'title' => 'Berhasil!', 'description' => 'Data guru berhasil diupdate.', 'position' => 'toast-top toast-end', 'icon' => '', 'css' => 'alert-success', 'timeout' => 3000, 'noProgress' => false]);
+            $this->dispatch('mary-toast', toast: ['type' => 'success', 'title' => 'Berhasil!', 'description' => 'Data dosen berhasil diupdate.', 'position' => 'toast-top toast-end', 'icon' => '', 'css' => 'alert-success', 'timeout' => 3000, 'noProgress' => false]);
         } else {
             TeacherModel::create([
                 'kode_guru' => $this->kode_guru,
+                'program_id' => $this->program_id ?: null,
                 'nama' => $this->nama,
                 'email' => $this->email,
                 'no_hp' => $this->no_hp,
                 'mata_pelajaran' => $this->mata_pelajaran,
                 'status' => $this->status,
             ]);
-            $this->dispatch('mary-toast', toast: ['type' => 'success', 'title' => 'Berhasil!', 'description' => 'Data guru berhasil ditambahkan.', 'position' => 'toast-top toast-end', 'icon' => '', 'css' => 'alert-success', 'timeout' => 3000, 'noProgress' => false]);
+            $this->dispatch('mary-toast', toast: ['type' => 'success', 'title' => 'Berhasil!', 'description' => 'Data dosen berhasil ditambahkan.', 'position' => 'toast-top toast-end', 'icon' => '', 'css' => 'alert-success', 'timeout' => 3000, 'noProgress' => false]);
         }
         $this->closeModal();
     }
@@ -82,6 +87,7 @@ class Teacher extends Component
         $teacher = TeacherModel::find($id);
         $this->teacherId = $teacher->id;
         $this->kode_guru = $teacher->kode_guru;
+        $this->program_id = $teacher->program_id;
         $this->nama = $teacher->nama;
         $this->email = $teacher->email;
         $this->no_hp = $teacher->no_hp;
@@ -94,20 +100,26 @@ class Teacher extends Component
     public function delete($id)
     {
         TeacherModel::find($id)->delete();
-        $this->dispatch('mary-toast', toast: ['type' => 'error', 'title' => 'Dihapus!', 'description' => 'Data guru berhasil dihapus.', 'position' => 'toast-top toast-end', 'icon' => '', 'css' => 'alert-error', 'timeout' => 3000, 'noProgress' => false]);
+        $this->dispatch('mary-toast', toast: ['type' => 'error', 'title' => 'Dihapus!', 'description' => 'Data dosen berhasil dihapus.', 'position' => 'toast-top toast-end', 'icon' => '', 'css' => 'alert-error', 'timeout' => 3000, 'noProgress' => false]);
     }
 
     public function render()
     {
-        $teachers = TeacherModel::query()
+        $teachers = TeacherModel::with('program')
             ->when($this->search, fn($q) => $q->where('nama', 'like', '%'.$this->search.'%')
                 ->orWhere('kode_guru', 'like', '%'.$this->search.'%')
                 ->orWhere('email', 'like', '%'.$this->search.'%')
                 ->orWhere('mata_pelajaran', 'like', '%'.$this->search.'%'))
             ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))
+            ->when($this->filterProgram, fn($q) => $q->where('program_id', $this->filterProgram))
             ->latest()
             ->get();
 
-        return view('livewire.pages.program.teacher', compact('teachers'));
+        $programs = Program::where('status', 'Aktif')
+            ->get()
+            ->map(fn($p) => ['id' => $p->id, 'name' => $p->nama_program . ' (' . $p->jalur . ')'])
+            ->toArray();
+
+        return view('livewire.pages.program.teacher', compact('teachers', 'programs'));
     }
 }

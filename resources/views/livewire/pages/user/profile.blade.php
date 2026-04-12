@@ -14,7 +14,7 @@
             <p class="text-sm opacity-50 mt-1">{{ auth()->user()->email }}</p>
             <div class="mt-3">
                 @foreach(auth()->user()->getRoleNames() as $role)
-                    <x-badge :value="$role" class="{{ $role === 'admin' ? 'badge-primary' : 'badge-secondary' }}" />
+                    <x-badge :value="$role === 'program' ? 'Staff Prodi' : $role" class="{{ $role === 'admin' ? 'badge-primary' : 'badge-secondary' }}" />
                 @endforeach
             </div>
             <div class="divider"></div>

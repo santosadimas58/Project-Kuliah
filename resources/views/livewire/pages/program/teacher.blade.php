@@ -12,6 +12,12 @@
             class="flex-1 min-w-[200px]"
         />
         <x-select
+            placeholder="Semua Program Studi"
+            wire:model.live="filterProgram"
+            :options="$programs"
+            class="w-56"
+        />
+        <x-select
             placeholder="Semua Status"
             wire:model.live="filterStatus"
             :options="[
@@ -20,7 +26,7 @@
             ]"
             class="w-40"
         />
-        @if($search || $filterStatus)
+        @if($search || $filterStatus || $filterProgram)
         <x-button label="Reset" wire:click="resetFilter" class="btn-ghost btn-sm" icon="o-x-mark" />
         @endif
     </div>
@@ -32,6 +38,7 @@
                         <th>#</th>
                         <th>NIDN</th>
                         <th>Nama Dosen</th>
+                        <th>Program Studi</th>
                         <th>Email</th>
                         <th>No. HP</th>
                         <th>Mata Kuliah</th>
@@ -45,6 +52,13 @@
                         <td>{{ $i + 1 }}</td>
                         <td><span class="font-mono text-sm">{{ $teacher->kode_guru }}</span></td>
                         <td class="font-medium">{{ $teacher->nama }}</td>
+                        <td>
+                            @if($teacher->program)
+                                <x-badge :value="$teacher->program->nama_program" class="badge-outline" />
+                            @else
+                                <span class="opacity-40">-</span>
+                            @endif
+                        </td>
                         <td class="text-sm">{{ $teacher->email }}</td>
                         <td>{{ $teacher->no_hp ?? '-' }}</td>
                         <td>
@@ -67,9 +81,9 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center py-8">
+                        <td colspan="9" class="text-center py-8">
                             <x-icon name="o-academic-cap" class="w-12 h-12 mx-auto opacity-30 mb-2" />
-                            <p class="opacity-50">{{ $search || $filterStatus ? 'Tidak ada hasil yang cocok.' : 'Belum ada data dosen.' }}</p>
+                            <p class="opacity-50">{{ $search || $filterStatus || $filterProgram ? 'Tidak ada hasil yang cocok.' : 'Belum ada data dosen.' }}</p>
                         </td>
                     </tr>
                     @endforelse
@@ -96,6 +110,14 @@
             <div class="md:col-span-2">
                 <x-input label="Nama Dosen" wire:model="nama" placeholder="Masukkan nama lengkap dosen" />
                 @error('nama') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
+            <div class="md:col-span-2">
+                <x-select
+                    label="Program Studi"
+                    wire:model="program_id"
+                    :options="$programs"
+                    placeholder="Pilih program studi"
+                />
             </div>
             <div class="md:col-span-2">
                 <x-input label="Email" wire:model="email" type="email" placeholder="Masukkan email dosen" />
