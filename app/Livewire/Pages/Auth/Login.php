@@ -31,7 +31,7 @@ class Login extends Component
                 $this->redirectRoute('admin.dashboard', navigate: false);
                 return;
             } elseif ($user->hasRole('program')) {
-                $this->redirectRoute('program.teacher', navigate: false);
+                $this->redirectRoute('program.subject', navigate: false);
                 return;
             }
             $this->redirectRoute('user.dashboard', navigate: false);

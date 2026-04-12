@@ -1,27 +1,27 @@
 <div>
-    <x-header title="Program" subtitle="Manajemen data program" separator>
+    <x-header title="Program Studi" subtitle="Manajemen data program studi universitas" separator>
         <x-slot:actions>
-            <x-button label="+ Tambah Program" wire:click="openModal" class="btn-primary" icon="o-plus" />
+            <x-button label="+ Tambah Program Studi" wire:click="openModal" class="btn-primary" icon="o-plus" />
         </x-slot:actions>
     </x-header>
-
-    {{-- Search & Filter --}}
     <div class="flex flex-wrap gap-3 mb-4 items-center">
         <x-input
-            placeholder="Cari kode atau nama program..."
+            placeholder="Cari kode atau nama program studi..."
             wire:model.live.debounce.300ms="search"
             icon="o-magnifying-glass"
             class="flex-1 min-w-[200px]"
         />
         <x-select
-            placeholder="Semua Jalur"
+            placeholder="Semua Jenjang"
             wire:model.live="filterJalur"
             :options="[
-                ['id' => 'Jalur A', 'name' => 'Jalur A'],
-                ['id' => 'Jalur B', 'name' => 'Jalur B'],
-                ['id' => 'Jalur C', 'name' => 'Jalur C'],
+                ['id' => 'S1', 'name' => 'S1 - Sarjana'],
+                ['id' => 'S2', 'name' => 'S2 - Magister'],
+                ['id' => 'S3', 'name' => 'S3 - Doktor'],
+                ['id' => 'D3', 'name' => 'D3 - Diploma'],
+                ['id' => 'D4', 'name' => 'D4 - Sarjana Terapan'],
             ]"
-            class="w-36"
+            class="w-44"
         />
         <x-select
             placeholder="Semua Status"
@@ -42,17 +42,16 @@
         <x-button label="Reset" wire:click="resetFilter" class="btn-ghost btn-sm" icon="o-x-mark" />
         @endif
     </div>
-
     <x-card>
         <div class="overflow-x-auto">
             <table class="table table-zebra w-full">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Kode</th>
-                        <th>Nama Program</th>
+                        <th>Kode Prodi</th>
+                        <th>Nama Program Studi</th>
                         <th>Deskripsi</th>
-                        <th>Jalur</th>
+                        <th>Jenjang</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
@@ -82,30 +81,27 @@
                         </td>
                         <td class="flex gap-2">
                             <x-button label="Edit" wire:click="edit({{ $program->id }})" class="btn-sm btn-info" icon="o-pencil" />
-                            <x-button label="Hapus" wire:click="delete({{ $program->id }})" wire:confirm="Yakin ingin menghapus program ini?" class="btn-sm btn-error" icon="o-trash" />
+                            <x-button label="Hapus" wire:click="delete({{ $program->id }})" wire:confirm="Yakin ingin menghapus program studi ini?" class="btn-sm btn-error" icon="o-trash" />
                         </td>
                     </tr>
                     @empty
                     <tr>
                         <td colspan="7" class="text-center py-8">
-                            <x-icon name="o-archive-box" class="w-12 h-12 mx-auto opacity-30 mb-2" />
-                            <p class="opacity-50">{{ $search || $filterStatus || $filterJalur ? 'Tidak ada hasil yang cocok.' : 'Belum ada data program.' }}</p>
+                            <x-icon name="o-academic-cap" class="w-12 h-12 mx-auto opacity-30 mb-2" />
+                            <p class="opacity-50">{{ $search || $filterStatus || $filterJalur ? 'Tidak ada hasil yang cocok.' : 'Belum ada data program studi.' }}</p>
                         </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-
         <div class="mt-4">
             {{ $programs->links() }}
         </div>
     </x-card>
-
-    {{-- Modal --}}
-    <x-modal wire:model="showModal" :title="$editMode ? 'Edit Program' : 'Tambah Program Baru'" separator>
+    <x-modal wire:model="showModal" :title="$editMode ? 'Edit Program Studi' : 'Tambah Program Studi'" separator>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-input label="Kode Program" wire:model="kode_program" disabled class="bg-base-200" />
+            <x-input label="Kode Prodi" wire:model="kode_program" disabled class="bg-base-200" />
             <x-select
                 label="Status"
                 wire:model="status"
@@ -116,22 +112,24 @@
                 ]"
             />
             <div class="md:col-span-2">
-                <x-input label="Nama Program" wire:model="nama_program" placeholder="Masukkan nama program" />
+                <x-input label="Nama Program Studi" wire:model="nama_program" placeholder="Contoh: Teknik Informatika" />
                 @error('nama_program') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
             </div>
             <div class="md:col-span-2">
-                <x-textarea label="Deskripsi" wire:model="deskripsi" placeholder="Deskripsi program (opsional)" rows="3" />
+                <x-textarea label="Deskripsi" wire:model="deskripsi" placeholder="Deskripsi program studi (opsional)" rows="3" />
             </div>
             <div class="md:col-span-2">
                 <x-select
-                    label="Jalur"
+                    label="Jenjang"
                     wire:model="jalur"
                     :options="[
-                        ['id' => 'Jalur A', 'name' => 'Jalur A'],
-                        ['id' => 'Jalur B', 'name' => 'Jalur B'],
-                        ['id' => 'Jalur C', 'name' => 'Jalur C'],
+                        ['id' => 'S1', 'name' => 'S1 - Sarjana'],
+                        ['id' => 'S2', 'name' => 'S2 - Magister'],
+                        ['id' => 'S3', 'name' => 'S3 - Doktor'],
+                        ['id' => 'D3', 'name' => 'D3 - Diploma'],
+                        ['id' => 'D4', 'name' => 'D4 - Sarjana Terapan'],
                     ]"
-                    placeholder="Pilih jalur"
+                    placeholder="Pilih jenjang"
                 />
                 @error('jalur') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
             </div>

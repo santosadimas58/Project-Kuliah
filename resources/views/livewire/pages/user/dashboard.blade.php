@@ -10,7 +10,7 @@
                 </div>
                 <div>
                     <p class="text-2xl font-bold">{{ $stats['teacher'] }}</p>
-                    <p class="text-xs opacity-50">Guru Aktif</p>
+                    <p class="text-xs opacity-50">Dosen Aktif</p>
                 </div>
             </div>
         </x-card>
@@ -21,7 +21,7 @@
                 </div>
                 <div>
                     <p class="text-2xl font-bold">{{ $stats['subject'] }}</p>
-                    <p class="text-xs opacity-50">Mata Pelajaran</p>
+                    <p class="text-xs opacity-50">Mata Kuliah</p>
                 </div>
             </div>
         </x-card>
@@ -61,7 +61,7 @@
                 <div>
                     <p class="font-bold text-lg">{{ auth()->user()->name }}</p>
                     <p class="opacity-50 text-sm">{{ auth()->user()->email }}</p>
-                    <x-badge value="Program" class="badge-secondary mt-1" />
+                    <x-badge value="Staff Prodi" class="badge-secondary mt-1" />
                 </div>
             </div>
         </x-card>
@@ -69,14 +69,14 @@
         {{-- Menu --}}
         <x-card title="Menu" icon="o-squares-2x2">
             <div class="grid grid-cols-2 gap-3">
-                <a href="/program/teacher">
-                    <x-button label="Teacher" icon="o-academic-cap" class="btn-outline w-full" />
+                <a href="/admin/teacher">
+                    <x-button label="Dosen" icon="o-academic-cap" class="btn-outline w-full" />
                 </a>
                 <a href="/program/subject">
-                    <x-button label="Subject" icon="o-book-open" class="btn-outline w-full" />
+                    <x-button label="Mata Kuliah" icon="o-book-open" class="btn-outline w-full" />
                 </a>
                 <a href="/program/schedule">
-                    <x-button label="Schedule" icon="o-calendar" class="btn-outline w-full" />
+                    <x-button label="Jadwal" icon="o-calendar" class="btn-outline w-full" />
                 </a>
                 <a href="/program/assignment">
                     <x-button label="Assignment" icon="o-clipboard-document" class="btn-outline w-full" />

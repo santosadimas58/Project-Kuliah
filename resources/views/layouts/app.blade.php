@@ -54,19 +54,19 @@
                 @endif
 
                 @role('admin')
-                    <x-menu-item title="Users" icon="o-users" link="/admin/users" />
-                    <x-menu-item title="Program" icon="o-archive-box" link="/admin/program" />
-                    <x-menu-item title="Inventory" icon="o-cube" link="/admin/inventory" />
+                    <x-menu-item title="Pengguna" icon="o-users" link="/admin/users" />
+                    <x-menu-item title="Program Studi" icon="o-archive-box" link="/admin/program" />
+                    <x-menu-item title="Dosen" icon="o-academic-cap" link="/admin/teacher" />
+                    <x-menu-item title="Inventaris" icon="o-cube" link="/admin/inventory" />
                 @endrole
 
                 @role('program')
                     <x-menu-separator />
-                    <x-menu-item title="Teacher" icon="o-academic-cap" link="/program/teacher" />
-                    <x-menu-item title="Subject" icon="o-book-open" link="/program/subject" />
-                    <x-menu-item title="Schedule" icon="o-calendar" link="/program/schedule" />
+                    <x-menu-item title="Mata Kuliah" icon="o-book-open" link="/program/subject" />
+                    <x-menu-item title="Jadwal" icon="o-calendar" link="/program/schedule" />
                     <x-menu-item title="Assignment" icon="o-clipboard-document" link="/program/assignment" />
                     <x-menu-separator />
-                    <x-menu-item title="Profile" icon="o-user-circle" link="/user/profile" />
+                    <x-menu-item title="Profil" icon="o-user-circle" link="/user/profile" />
                 @endrole
             </x-menu>
         </x-slot:sidebar>

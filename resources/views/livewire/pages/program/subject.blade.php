@@ -1,14 +1,14 @@
 <div>
-    <x-header title="Mata Pelajaran" subtitle="Manajemen data mata pelajaran" separator>
+    <x-header title="Mata Kuliah" subtitle="Manajemen data mata kuliah program studi" separator>
         <x-slot:actions>
-            <x-button label="+ Tambah Mapel" wire:click="openModal" class="btn-primary" icon="o-plus" />
+            <x-button label="+ Tambah Mata Kuliah" wire:click="openModal" class="btn-primary" icon="o-plus" />
         </x-slot:actions>
     </x-header>
 
     {{-- Search & Filter --}}
     <div class="flex flex-wrap gap-3 mb-4 items-center">
         <x-input
-            placeholder="Cari kode atau nama mapel..."
+            placeholder="Cari kode atau nama mata kuliah..."
             wire:model.live.debounce.300ms="search"
             icon="o-magnifying-glass"
             class="flex-1 min-w-[200px]"
@@ -40,7 +40,7 @@
                     <tr>
                         <th>#</th>
                         <th>Kode</th>
-                        <th>Nama Mapel</th>
+                        <th>Nama Mata Kuliah</th>
                         <th>Kategori</th>
                         <th>SKS</th>
                         <th>Status</th>
@@ -71,14 +71,14 @@
                         </td>
                         <td class="flex gap-2">
                             <x-button label="Edit" wire:click="edit({{ $subject->id }})" class="btn-sm btn-info" icon="o-pencil" />
-                            <x-button label="Hapus" wire:click="delete({{ $subject->id }})" wire:confirm="Yakin ingin menghapus mata pelajaran ini?" class="btn-sm btn-error" icon="o-trash" />
+                            <x-button label="Hapus" wire:click="delete({{ $subject->id }})" wire:confirm="Yakin ingin menghapus mata kuliah ini?" class="btn-sm btn-error" icon="o-trash" />
                         </td>
                     </tr>
                     @empty
                     <tr>
                         <td colspan="7" class="text-center py-8">
                             <x-icon name="o-book-open" class="w-12 h-12 mx-auto opacity-30 mb-2" />
-                            <p class="opacity-50">{{ $search || $filterStatus || $filterKategori ? 'Tidak ada hasil yang cocok.' : 'Belum ada data mata pelajaran.' }}</p>
+                            <p class="opacity-50">{{ $search || $filterStatus || $filterKategori ? 'Tidak ada hasil yang cocok.' : 'Belum ada data mata kuliah.' }}</p>
                         </td>
                     </tr>
                     @endforelse
@@ -88,16 +88,16 @@
 
         @if($subjects->count() > 0)
         <div class="text-sm text-gray-400 mt-3">
-            Menampilkan {{ $subjects->count() }} mata pelajaran
+            Menampilkan {{ $subjects->count() }} mata kuliah
         </div>
         @endif
     </x-card>
 
     {{-- Modal --}}
-    <x-modal wire:model="showModal" :title="$editMode ? 'Edit Mata Pelajaran' : 'Tambah Mata Pelajaran'" separator>
+    <x-modal wire:model="showModal" :title="$editMode ? 'Edit Mata Kuliah' : 'Tambah Mata Kuliah'" separator>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <x-input
-                label="Kode Mapel"
+                label="Kode Mata Kuliah"
                 wire:model="kode_mapel"
                 disabled
                 class="bg-base-200"
@@ -111,16 +111,16 @@
             />
             <div class="md:col-span-2">
                 <x-input
-                    label="Nama Mata Pelajaran"
+                    label="Nama Mata Kuliah"
                     wire:model="nama_mapel"
-                    placeholder="Contoh: Matematika Dasar"
+                    placeholder="Contoh: Algoritma & Pemrograman"
                 />
                 @error('nama_mapel') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
             </div>
             <x-input
                 label="Kategori"
                 wire:model="kategori"
-                placeholder="Contoh: Sains, Bahasa, Teknik..."
+                placeholder="Contoh: Wajib, Pilihan, Praktikum"
             />
             <x-select
                 label="Status"

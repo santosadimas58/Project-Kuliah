@@ -10,7 +10,7 @@
                 </div>
                 <div>
                     <p class="text-2xl font-bold">{{ $totalUsers }}</p>
-                    <p class="text-xs opacity-50">Total Users</p>
+                    <p class="text-xs opacity-50">Total Pengguna</p>
                 </div>
             </div>
         </x-card>
@@ -32,7 +32,7 @@
                 </div>
                 <div>
                     <p class="text-2xl font-bold">{{ $totalPrograms }}</p>
-                    <p class="text-xs opacity-50">Total Program</p>
+                    <p class="text-xs opacity-50">Total Program Studi</p>
                 </div>
             </div>
         </x-card>
@@ -58,7 +58,7 @@
                 </div>
                 <div>
                     <p class="text-2xl font-bold">{{ $totalTeachers }}</p>
-                    <p class="text-xs opacity-50">Guru Aktif</p>
+                    <p class="text-xs opacity-50">Dosen Aktif</p>
                 </div>
             </div>
         </x-card>
@@ -69,7 +69,7 @@
                 </div>
                 <div>
                     <p class="text-2xl font-bold">{{ $totalSubjects }}</p>
-                    <p class="text-xs opacity-50">Mata Pelajaran</p>
+                    <p class="text-xs opacity-50">Mata Kuliah</p>
                 </div>
             </div>
         </x-card>
@@ -100,7 +100,7 @@
     {{-- Recent Data --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {{-- Recent Users --}}
-        <x-card title="User Terbaru" icon="o-user-plus">
+        <x-card title="Pengguna Terbaru" icon="o-user-plus">
             @forelse($recentUsers as $user)
             <div class="flex items-center justify-between py-2 border-b border-base-200 last:border-0">
                 <div class="flex items-center gap-3">
@@ -116,23 +116,23 @@
                 </div>
                 <div class="text-right">
                     @foreach($user->getRoleNames() as $role)
-                        <x-badge :value="$role" class="{{ $role === 'admin' ? 'badge-primary' : 'badge-secondary' }} badge-sm" />
+                        <x-badge :value="$role === 'program' ? 'Staff Prodi' : $role" class="{{ $role === 'admin' ? 'badge-primary' : 'badge-secondary' }} badge-sm" />
                     @endforeach
                     <p class="text-xs opacity-40 mt-1">{{ $user->created_at->diffForHumans() }}</p>
                 </div>
             </div>
             @empty
-            <p class="text-center opacity-40 py-4 text-sm">Belum ada user.</p>
+            <p class="text-center opacity-40 py-4 text-sm">Belum ada pengguna.</p>
             @endforelse
             <div class="mt-3">
                 <a href="/admin/users">
-                    <x-button label="Lihat Semua User" icon="o-arrow-right" class="btn-sm btn-ghost w-full" />
+                    <x-button label="Lihat Semua Pengguna" icon="o-arrow-right" class="btn-sm btn-ghost w-full" />
                 </a>
             </div>
         </x-card>
 
         {{-- Recent Programs --}}
-        <x-card title="Program Terbaru" icon="o-archive-box">
+        <x-card title="Program Studi Terbaru" icon="o-archive-box">
             @forelse($recentPrograms as $program)
             <div class="flex items-center justify-between py-2 border-b border-base-200 last:border-0">
                 <div>
@@ -148,11 +148,11 @@
                 />
             </div>
             @empty
-            <p class="text-center opacity-40 py-4 text-sm">Belum ada program.</p>
+            <p class="text-center opacity-40 py-4 text-sm">Belum ada program studi.</p>
             @endforelse
             <div class="mt-3">
                 <a href="/admin/program">
-                    <x-button label="Lihat Semua Program" icon="o-arrow-right" class="btn-sm btn-ghost w-full" />
+                    <x-button label="Lihat Semua Program Studi" icon="o-arrow-right" class="btn-sm btn-ghost w-full" />
                 </a>
             </div>
         </x-card>

@@ -1,14 +1,12 @@
 <div>
-    <x-header title="Data Guru" subtitle="Manajemen data guru" separator>
+    <x-header title="Data Dosen" subtitle="Manajemen data dosen universitas" separator>
         <x-slot:actions>
-            <x-button label="+ Tambah Guru" wire:click="openModal" class="btn-primary" icon="o-plus" />
+            <x-button label="+ Tambah Dosen" wire:click="openModal" class="btn-primary" icon="o-plus" />
         </x-slot:actions>
     </x-header>
-
-    {{-- Search & Filter --}}
     <div class="flex flex-wrap gap-3 mb-4 items-center">
         <x-input
-            placeholder="Cari nama, kode, email, mata pelajaran..."
+            placeholder="Cari nama, NIDN, email, mata kuliah..."
             wire:model.live.debounce.300ms="search"
             icon="o-magnifying-glass"
             class="flex-1 min-w-[200px]"
@@ -26,18 +24,17 @@
         <x-button label="Reset" wire:click="resetFilter" class="btn-ghost btn-sm" icon="o-x-mark" />
         @endif
     </div>
-
     <x-card>
         <div class="overflow-x-auto">
             <table class="table table-zebra w-full">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Kode</th>
-                        <th>Nama</th>
+                        <th>NIDN</th>
+                        <th>Nama Dosen</th>
                         <th>Email</th>
                         <th>No. HP</th>
-                        <th>Mata Pelajaran</th>
+                        <th>Mata Kuliah</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
@@ -65,37 +62,29 @@
                         </td>
                         <td class="flex gap-2">
                             <x-button label="Edit" wire:click="edit({{ $teacher->id }})" class="btn-sm btn-info" icon="o-pencil" />
-                            <x-button label="Hapus" wire:click="delete({{ $teacher->id }})" wire:confirm="Yakin ingin menghapus data guru ini?" class="btn-sm btn-error" icon="o-trash" />
+                            <x-button label="Hapus" wire:click="delete({{ $teacher->id }})" wire:confirm="Yakin ingin menghapus data dosen ini?" class="btn-sm btn-error" icon="o-trash" />
                         </td>
                     </tr>
                     @empty
                     <tr>
                         <td colspan="8" class="text-center py-8">
                             <x-icon name="o-academic-cap" class="w-12 h-12 mx-auto opacity-30 mb-2" />
-                            <p class="opacity-50">{{ $search || $filterStatus ? 'Tidak ada hasil yang cocok.' : 'Belum ada data guru.' }}</p>
+                            <p class="opacity-50">{{ $search || $filterStatus ? 'Tidak ada hasil yang cocok.' : 'Belum ada data dosen.' }}</p>
                         </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-
         @if($teachers->count() > 0)
         <div class="text-sm text-gray-400 mt-3">
-            Menampilkan {{ $teachers->count() }} guru
+            Menampilkan {{ $teachers->count() }} dosen
         </div>
         @endif
     </x-card>
-
-    {{-- Modal --}}
-    <x-modal wire:model="showModal" :title="$editMode ? 'Edit Guru' : 'Tambah Guru Baru'" separator>
+    <x-modal wire:model="showModal" :title="$editMode ? 'Edit Dosen' : 'Tambah Dosen Baru'" separator>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <x-input
-                label="Kode Guru"
-                wire:model="kode_guru"
-                disabled
-                class="bg-base-200"
-            />
+            <x-input label="NIDN" wire:model="kode_guru" disabled class="bg-base-200" />
             <x-select
                 label="Status"
                 wire:model="status"
@@ -105,15 +94,15 @@
                 ]"
             />
             <div class="md:col-span-2">
-                <x-input label="Nama Guru" wire:model="nama" placeholder="Masukkan nama lengkap guru" />
+                <x-input label="Nama Dosen" wire:model="nama" placeholder="Masukkan nama lengkap dosen" />
                 @error('nama') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
             </div>
             <div class="md:col-span-2">
-                <x-input label="Email" wire:model="email" type="email" placeholder="Masukkan email guru" />
+                <x-input label="Email" wire:model="email" type="email" placeholder="Masukkan email dosen" />
                 @error('email') <span class="text-error text-xs mt-1">{{ $message }}</span> @enderror
             </div>
             <x-input label="No. HP" wire:model="no_hp" placeholder="Contoh: 08123456789" />
-            <x-input label="Mata Pelajaran" wire:model="mata_pelajaran" placeholder="Contoh: Matematika" />
+            <x-input label="Mata Kuliah Diampu" wire:model="mata_pelajaran" placeholder="Contoh: Algoritma & Pemrograman" />
         </div>
         <x-slot:actions>
             <x-button label="Batal" wire:click="closeModal" icon="o-x-mark" />

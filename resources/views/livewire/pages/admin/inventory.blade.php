@@ -1,21 +1,20 @@
 <div>
-    <x-header title="Inventory" subtitle="Manajemen data barang" separator>
+    <x-header title="Inventaris" subtitle="Manajemen aset dan peralatan kampus" separator>
         <x-slot:actions>
-            <x-button label="+ Tambah Barang" wire:click="openModal" class="btn-primary" icon="o-plus" />
+            <x-button label="+ Tambah Aset" wire:click="openModal" class="btn-primary" icon="o-plus" />
         </x-slot:actions>
     </x-header>
-
     <x-card>
         <div class="overflow-x-auto">
             <table class="table table-zebra w-full">
                 <thead>
                     <tr>
                         <th>Kode</th>
-                        <th>Nama Barang</th>
+                        <th>Nama Aset</th>
                         <th>Kategori</th>
                         <th>Jumlah</th>
                         <th>Kondisi</th>
-                        <th>Lokasi</th>
+                        <th>Ruangan/Gedung</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -32,14 +31,14 @@
                         <td>{{ $item->lokasi ?? '-' }}</td>
                         <td class="flex gap-2">
                             <x-button label="Edit" wire:click="edit({{ $item->id }})" class="btn-sm btn-info" icon="o-pencil" />
-                            <x-button label="Hapus" wire:click="delete({{ $item->id }})" wire:confirm="Yakin ingin menghapus?" class="btn-sm btn-error" icon="o-trash" />
+                            <x-button label="Hapus" wire:click="delete({{ $item->id }})" wire:confirm="Yakin ingin menghapus aset ini?" class="btn-sm btn-error" icon="o-trash" />
                         </td>
                     </tr>
                     @empty
                     <tr>
                         <td colspan="7" class="text-center py-8">
-                            <x-icon name="o-archive-box" class="w-12 h-12 mx-auto opacity-30 mb-2" />
-                            <p class="opacity-50">Belum ada data inventory.</p>
+                            <x-icon name="o-cube" class="w-12 h-12 mx-auto opacity-30 mb-2" />
+                            <p class="opacity-50">Belum ada data inventaris.</p>
                         </td>
                     </tr>
                     @endforelse
@@ -47,27 +46,21 @@
             </table>
         </div>
     </x-card>
-
-    <x-modal wire:model="showModal" title="{{ $editMode ? 'Edit Barang' : 'Tambah Barang Baru' }}">
-        <x-input label="Kode Barang" wire:model="kode_barang" disabled />
-        <x-input label="Nama Barang" wire:model="nama_barang" placeholder="Masukkan nama barang" class="mt-3" />
+    <x-modal wire:model="showModal" title="{{ $editMode ? 'Edit Aset' : 'Tambah Aset Baru' }}">
+        <x-input label="Kode Aset" wire:model="kode_barang" disabled />
+        <x-input label="Nama Aset" wire:model="nama_barang" placeholder="Contoh: Proyektor Epson EB-X41" class="mt-3" />
         @error('nama_barang') <span class="text-error text-xs">{{ $message }}</span> @enderror
-
-        <x-input label="Kategori" wire:model="kategori" placeholder="Masukkan kategori" class="mt-3" />
+        <x-input label="Kategori" wire:model="kategori" placeholder="Contoh: Elektronik, Furnitur, Alat Tulis" class="mt-3" />
         @error('kategori') <span class="text-error text-xs">{{ $message }}</span> @enderror
-
         <x-input label="Jumlah" wire:model="jumlah" type="number" min="0" class="mt-3" />
         @error('jumlah') <span class="text-error text-xs">{{ $message }}</span> @enderror
-
         <x-select label="Kondisi" wire:model="kondisi" class="mt-3" :options="[
             ['id' => 'Baik', 'name' => 'Baik'],
             ['id' => 'Rusak Ringan', 'name' => 'Rusak Ringan'],
             ['id' => 'Rusak Berat', 'name' => 'Rusak Berat'],
         ]" />
         @error('kondisi') <span class="text-error text-xs">{{ $message }}</span> @enderror
-
-        <x-input label="Lokasi" wire:model="lokasi" placeholder="Masukkan lokasi barang" class="mt-3" />
-
+        <x-input label="Ruangan/Gedung" wire:model="lokasi" placeholder="Contoh: Lab Komputer A, Gedung B Lt.2" class="mt-3" />
         <x-slot:actions>
             <x-button label="Batal" wire:click="closeModal" icon="o-x-mark" />
             <x-button label="Simpan" wire:click="save" class="btn-primary" icon="o-check" />

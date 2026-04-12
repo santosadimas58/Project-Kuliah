@@ -1,7 +1,7 @@
 <div>
-    <x-header title="Manajemen User" subtitle="Kelola user dan role" separator>
+    <x-header title="Manajemen Pengguna" subtitle="Kelola pengguna dan hak akses" separator>
         <x-slot:actions>
-            <x-button label="+ Tambah User" wire:click="openModal" class="btn-primary" icon="o-plus" />
+            <x-button label="+ Tambah Pengguna" wire:click="openModal" class="btn-primary" icon="o-plus" />
         </x-slot:actions>
     </x-header>
 
@@ -60,7 +60,7 @@
                             <x-button
                                 label="Hapus"
                                 wire:click="delete({{ $user->id }})"
-                                wire:confirm="Yakin ingin menghapus user ini?"
+                                wire:confirm="Yakin ingin menghapus pengguna ini?"
                                 class="btn-sm btn-error"
                                 icon="o-trash"
                                 :disabled="$user->id === auth()->id()"
@@ -71,7 +71,7 @@
                     <tr>
                         <td colspan="6" class="text-center py-8">
                             <x-icon name="o-users" class="w-12 h-12 mx-auto opacity-30 mb-2" />
-                            <p class="opacity-50">{{ $search || $filterRole ? 'Tidak ada hasil yang cocok.' : 'Belum ada data user.' }}</p>
+                            <p class="opacity-50">{{ $search || $filterRole ? 'Tidak ada hasil yang cocok.' : 'Belum ada data pengguna.' }}</p>
                         </td>
                     </tr>
                     @endforelse
@@ -81,12 +81,12 @@
 
         @if($users->count() > 0)
         <div class="text-sm text-gray-400 mt-3">
-            Menampilkan {{ $users->count() }} user
+            Menampilkan {{ $users->count() }} pengguna
         </div>
         @endif
     </x-card>
 
-    <x-modal wire:model="showModal" :title="$editMode ? 'Edit User' : 'Tambah User Baru'" separator>
+    <x-modal wire:model="showModal" :title="$editMode ? 'Edit Pengguna' : 'Tambah Pengguna Baru'" separator>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="md:col-span-2">
                 <x-input label="Nama Lengkap" wire:model="name" placeholder="Masukkan nama lengkap" />

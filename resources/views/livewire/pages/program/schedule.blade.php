@@ -1,5 +1,5 @@
 <div>
-    <x-header title="Jadwal" subtitle="Manajemen jadwal pelajaran" separator>
+    <x-header title="Jadwal" subtitle="Manajemen jadwal kuliah program studi" separator>
         <x-slot:actions>
             <x-button label="+ Tambah Jadwal" wire:click="openModal" class="btn-primary" icon="o-plus" />
         </x-slot:actions>
@@ -8,7 +8,7 @@
     {{-- Search & Filter --}}
     <div class="flex flex-wrap gap-3 mb-4 items-center">
         <x-input
-            placeholder="Cari mata pelajaran, guru, ruangan..."
+            placeholder="Cari mata kuliah, dosen, ruangan..."
             wire:model.live.debounce.300ms="search"
             icon="o-magnifying-glass"
             class="flex-1 min-w-[200px]"
@@ -48,8 +48,8 @@
                         <th>#</th>
                         <th>Hari</th>
                         <th>Jam</th>
-                        <th>Mata Pelajaran</th>
-                        <th>Guru</th>
+                        <th>Mata Kuliah</th>
+                        <th>Dosen</th>
                         <th>Ruangan</th>
                         <th>Status</th>
                         <th>Aksi</th>
@@ -109,10 +109,10 @@
                 ]"
                 placeholder="Pilih hari"
             />
-            <x-input label="Mata Pelajaran" wire:model="mata_pelajaran" placeholder="Contoh: Matematika" />
+            <x-input label="Mata Kuliah" wire:model="mata_pelajaran" placeholder="Contoh: Algoritma & Pemrograman" />
             <x-input label="Jam Mulai" wire:model="jam_mulai" type="time" />
             <x-input label="Jam Selesai" wire:model="jam_selesai" type="time" />
-            <x-input label="Guru" wire:model="guru" placeholder="Nama guru" />
+            <x-input label="Dosen Pengampu" wire:model="guru" placeholder="Nama dosen pengampu" />
             <x-input label="Ruangan" wire:model="ruangan" placeholder="Contoh: Ruang A1 (opsional)" />
             <x-select
                 label="Status"
